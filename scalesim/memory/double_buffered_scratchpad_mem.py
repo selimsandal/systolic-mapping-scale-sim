@@ -276,7 +276,8 @@ class double_buffered_scratchpad:
             ofmap_serviced_cycles += [ofmap_cycle_out[0]]
             ofmap_stalls = ofmap_cycle_out[0] - cycle_arr[0]
 
-            self.stall_cycles += int(max(ifmap_stalls[0], filter_stalls[0], ofmap_stalls[0]))
+            # numpy 2.x: max() over numpy scalars returns a 0-d ndarray; coerce.
+            self.stall_cycles += int(np.max([ifmap_stalls[0], filter_stalls[0], ofmap_stalls[0]]).item())
             #self.stall_cycles += ifmap_stalls[0] + filter_stalls[0] + ofmap_stalls[0]
 
         if self.estimate_bandwidth_mode:
@@ -304,7 +305,8 @@ class double_buffered_scratchpad:
                                                  axis=1)
         #self.total_cycles = int(ofmap_serviced_cycles[-1][0])
         ## Probable fault in sanity check
-        self.total_cycles = int(max(ofmap_serviced_cycles))
+        # numpy 2.x compat — see read_buffer.py:423.
+        self.total_cycles = int(np.max(ofmap_serviced_cycles).item())
 
         # END of serving demands from memory
         self.traces_valid = True

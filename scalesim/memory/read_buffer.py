@@ -420,7 +420,9 @@ class read_buffer:
 
         # 4. Update the variables
         #self.last_prefetch_cycle = int(response_cycles_arr[-1][0])
-        self.last_prefetch_cycle = int(max(response_cycles_arr))
+        # numpy 2.x: max() over a numpy array returns a 0-d ndarray, which int()
+        # rejects. np.max + .item() gives a Python int and is back-compat with 1.x.
+        self.last_prefetch_cycle = int(np.max(response_cycles_arr).item())
 
         # Update the trace matrix
         self.trace_matrix = np.column_stack((response_cycles_arr, prefetch_requests))
